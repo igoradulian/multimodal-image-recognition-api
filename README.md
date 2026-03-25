@@ -1,50 +1,118 @@
-# Demo Basic AI Chat Bot
+# AI Vision Chat API (Go)
 
-Minimal Go API that accepts text + image uploads and forwards them to local LLMs (Ollama) or cloud vision models (OpenAI, Gemini).
+Production-style demo API that accepts text + image uploads and routes them to:
+- local multimodal inference via Ollama
+- cloud vision models via OpenAI and Google Gemini
 
-## Features
+This project is designed as a portfolio backend sample focused on API design, multipart handling, provider abstraction, and secure environment-based configuration.
 
-- Local inference via Ollama for lightweight models
-- Cloud vision endpoints using OpenAI and Gemini
-- Multipart form uploads for image + prompt
-- Simple REST interface for easy integration
+## Why this project
 
-## Prerequisites
+- Demonstrates practical Go backend skills with Gin routing and handler separation
+- Shows multimodel AI integration in one service (`Ollama`, `OpenAI`, `Gemini`)
+- Includes DTO/service layering to keep request/response logic organized
+- Uses env vars for credentials (no hardcoded API keys)
 
-- Go 1.20+ (based on `go.mod`)
-- Ollama (optional, only for local `/responses` endpoint)
-- OpenAI and/or Gemini API keys for cloud endpoints
+## Tech Stack
 
-## Setup
+- Go 1.20+
+- Gin (`github.com/gin-gonic/gin`)
+- OpenAI Chat Completions (vision request format)
+- Google GenAI SDK (`google.golang.org/genai`)
+- Ollama local API (`http://localhost:11434`)
 
-1) Copy environment variables
+## Project Structure
+
+```text
+cmd/
+  main.go                 # app entrypoint and route registration
+internal/
+  dto/                    # request/response models
+  service/                # OpenAI, Gemini, image utilities
+web/
+  app/
+    chat_app.go           # HTTP handlers
+```
+
+## API Endpoints
+
+Base URL: `http://localhost:8089/api/v1`
+
+- `GET /responses`
+  - Health-style sample chatbot response
+- `GET /responses/version`
+  - Proxies Ollama tag/version info
+- `POST /responses`
+  - Local Ollama multimodal chat
+  - Multipart fields: `message`, `file`
+- `POST /openai/vision`
+  - OpenAI vision analysis
+  - Multipart fields: `message`, `file`
+- `POST /google/vision`
+  - Gemini-based product extraction flow
+  - Multipart fields: `message`, `data`
+
+## Quick Start
+
+1. Clone and enter the repo.
+2. Copy environment template.
+3. Run the server.
 
 ```bash
 cp .env.example .env
-```
-
-2) Fill in API keys in `.env`
-
-- `OPENAI_API_KEY` for `/api/v1/openai/vision`
-- `GEMINI_API_KEY` for `/api/v1/google/vision`
-
-## Run
-
-```bash
 go run ./cmd
 ```
 
-Server starts on `:8089`.
+Server listens on `:8089`.
 
-## Endpoints
+## Configuration
 
-- `POST /api/v1/openai/vision` (form-data: `message`, `file`)
-- `POST /api/v1/google/vision` (form-data: `message`, `data`)
-- `POST /api/v1/responses` (form-data: `message`, `file`)
-  - Forwards to local Ollama at `http://localhost:11434`
+Set values in `.env` (or export in your shell):
 
-## Notes
+- `OPENAI_API_KEY` for `POST /api/v1/openai/vision`
+- `GEMINI_API_KEY` for `POST /api/v1/google/vision`
 
-- Uploaded images are written to `./files/` or to `$HOME/img/files/<uuid>` for the Google endpoint.
-- Keep `.env` out of version control; use `.env.example` as a template.
-- If you do not use a cloud provider, you can omit its API key.
+Template file: `.env.example`
+
+## Example Requests
+
+### OpenAI vision
+
+```bash
+curl -X POST "http://localhost:8089/api/v1/openai/vision" \
+  -F "message=Describe what you see" \
+  -F "file=@/absolute/path/to/image.jpg"
+```
+
+### Gemini vision
+
+```bash
+curl -X POST "http://localhost:8089/api/v1/google/vision" \
+  -F "message=Extract product details" \
+  -F "data=@/absolute/path/to/image.jpg"
+```
+
+### Ollama local vision
+
+```bash
+curl -X POST "http://localhost:8089/api/v1/responses" \
+  -F "message=What is in this image?" \
+  -F "file=@/absolute/path/to/image.jpg"
+```
+
+## Security Notes
+
+- Do not commit `.env`.
+- Keep API keys in environment variables only.
+- `.gitignore` is configured to ignore `.env` and `.env.*` (except `.env.example`).
+
+## Portfolio Highlights
+
+- Multipart upload handling and file persistence
+- External API orchestration with structured error handling
+- Model output normalization into typed DTO responses
+- Clear path to evolve into provider interface abstraction and tests per provider
+
+## License
+
+MIT - see `LICENSE`.
