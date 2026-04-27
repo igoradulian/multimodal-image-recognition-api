@@ -1,5 +1,11 @@
 # AI Vision Chat API (Go)
 
+[<img src="https://img.shields.io/badge/Language-Go%201.20%2B-00ADD8" />](https://go.dev/)
+[<img src="https://img.shields.io/badge/Framework-Gin-009688" />](https://github.com/gin-gonic/gin)
+[<img src="https://img.shields.io/badge/AI-OpenAI%20Vision-412991" />](https://platform.openai.com/docs/guides/vision)
+[<img src="https://img.shields.io/badge/AI-Google%20Gemini-4285F4" />](https://ai.google.dev/)
+[<img src="https://img.shields.io/badge/License-MIT-yellow.svg" />](LICENSE)
+
 Production-style demo API that accepts text + image uploads and routes them to:
 - local multimodal inference via Ollama
 - cloud vision models via OpenAI and Google Gemini
